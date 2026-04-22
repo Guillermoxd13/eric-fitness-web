@@ -4,6 +4,9 @@
 -- Run in Supabase → SQL Editor.
 -- =====================================================================
 
+-- Defensivo: si la tabla legada dejó columna cloudflare_id NOT NULL, la quitamos.
+alter table public.videos drop column if exists cloudflare_id;
+
 -- Limpia el vídeo placeholder que usamos durante las pruebas iniciales.
 -- Si prefieres conservarlo, comenta esta línea antes de ejecutar.
 delete from public.videos where title = 'Montando el Servidor (SupraPixel)';

@@ -66,6 +66,11 @@ begin
   end if;
 end$$;
 
+-- Drop any legacy NOT NULL column that predates this schema (e.g. a leftover
+-- `cloudflare_id` from an older table version). We use `provider` + `video_id`
+-- instead. Safe even if the column doesn't exist.
+alter table public.videos drop column if exists cloudflare_id;
+
 create index if not exists videos_position_idx on public.videos (position);
 create index if not exists videos_is_locked_idx on public.videos (is_locked);
 
