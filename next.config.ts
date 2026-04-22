@@ -1,0 +1,15 @@
+import type { NextConfig } from "next";
+
+const config: NextConfig = {
+  reactStrictMode: true,
+  images: {
+    remotePatterns: [
+      { protocol: "https", hostname: "i.ytimg.com" },
+      { protocol: "https", hostname: "img.youtube.com" },
+      { protocol: "https", hostname: "customer-*.cloudflarestream.com" },
+      { protocol: "https", hostname: "videodelivery.net" },
+    ],
+  },
+};
+
+export default config;
