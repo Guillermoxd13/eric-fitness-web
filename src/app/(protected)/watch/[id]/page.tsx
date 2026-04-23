@@ -1,16 +1,25 @@
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowLeft, Crown, Lock } from "lucide-react";
+import { ArrowLeft, ArrowRight, Crown, Dot, Lock } from "lucide-react";
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { VideoPlayer } from "@/components/VideoPlayer";
-import { GlassCard } from "@/components/ui/GlassCard";
+import { Badge } from "@/components/ui/Badge";
 import type { Video } from "@/types/database";
 
 export const dynamic = "force-dynamic";
 
-type WatchVideo = Pick<Video, "id" | "title" | "description" | "category" | "is_locked" | "thumbnail_url">;
+type WatchVideo = Pick<
+  Video,
+  "id" | "title" | "description" | "category" | "is_locked" | "thumbnail_url" | "duration_seconds"
+>;
 type WatchProfile = { is_premium: boolean; current_period_end: string | null };
+
+function formatDuration(seconds: number | null): string {
+  if (!seconds) return "";
+  const m = Math.floor(seconds / 60);
+  return `${m} MIN`;
+}
 
 export default async function WatchPage({
   params,
@@ -22,7 +31,7 @@ export default async function WatchPage({
 
   const { data: video } = await supabase
     .from("videos")
-    .select("id, title, description, category, is_locked, thumbnail_url")
+    .select("id, title, description, category, is_locked, thumbnail_url, duration_seconds")
     .eq("id", id)
     .maybeSingle<WatchVideo>();
 
@@ -44,76 +53,106 @@ export default async function WatchPage({
   const locked = video.is_locked && !isPremium;
 
   return (
-    <div className="space-y-6">
-      <Link href="/dashboard" className="inline-flex items-center gap-1 text-sm text-white/60 hover:text-white">
-        <ArrowLeft className="h-4 w-4" /> Volver al panel
+    <div className="mx-auto max-w-6xl px-6 py-8 md:px-10 md:py-10">
+      <Link
+        href="/dashboard"
+        className="inline-flex items-center gap-1.5 text-[13px] text-white/60 transition hover:text-white"
+      >
+        <ArrowLeft className="h-3.5 w-3.5" /> Volver al panel
       </Link>
 
-      {locked ? (
-        <div className="glass relative overflow-hidden rounded-2xl">
-          <div className="relative aspect-video w-full">
+      <div className="mt-6">
+        {locked ? (
+          <div className="relative aspect-video overflow-hidden rounded-2xl border border-hair">
             {video.thumbnail_url ? (
               <Image
                 src={video.thumbnail_url}
                 alt={video.title}
                 fill
                 sizes="(max-width: 1024px) 100vw, 900px"
-                className="scale-110 object-cover blur-lg brightness-75"
+                className="scale-110 object-cover blur-xl brightness-[0.45]"
               />
             ) : (
-              <div className="absolute inset-0 bg-ink-700" />
+              <div className="placeholder-photo absolute inset-0" />
             )}
-            <div className="absolute inset-0 bg-gradient-to-t from-ink-900/80 via-ink-900/40" />
+            <div className="absolute inset-0 bg-gradient-to-b from-ink-900/20 to-ink-900/85" />
             <div className="absolute inset-0 grid place-items-center p-6 text-center">
               <div>
-                <div className="mx-auto w-fit rounded-full bg-black/50 p-5 ring-1 ring-amber-300/40 backdrop-blur">
+                <div className="mx-auto grid h-24 w-24 place-items-center rounded-full border border-gold-400/40 bg-black/50 shadow-glow-gold backdrop-blur">
                   <Lock
-                    className="h-10 w-10 text-amber-300 drop-shadow-[0_0_18px_rgba(251,191,36,0.6)]"
-                    strokeWidth={2.2}
+                    className="h-10 w-10 text-gold-400 drop-shadow-[0_0_18px_rgba(251,191,36,0.6)]"
+                    strokeWidth={2}
                   />
                 </div>
-                <p className="mt-4 text-lg font-semibold">Vídeo Premium</p>
-                <p className="mt-1 text-sm text-white/70">
-                  Suscríbete para desbloquear este entrenamiento.
+                <h2 className="mt-6 font-display text-3xl font-bold tracking-editorial-xl md:text-[32px]">
+                  Vídeo Premium
+                </h2>
+                <p className="mx-auto mt-2 max-w-md text-[15px] text-white/60">
+                  Suscríbete para desbloquear este entrenamiento y el resto del catálogo.
                 </p>
-                <Link href="/pricing" className="btn-primary mt-5 inline-flex">
-                  Ver planes
-                </Link>
+                <div className="mt-7 flex flex-col items-center justify-center gap-3 sm:flex-row">
+                  <Link href="/pricing" className="btn-gold btn-lg">
+                    Ver planes <ArrowRight className="h-4 w-4" />
+                  </Link>
+                  <Link href="/dashboard" className="btn-outline btn-lg">
+                    Ver vídeos gratis
+                  </Link>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      ) : (
-        <VideoPlayer videoId={video.id} />
-      )}
+        ) : (
+          <div className="overflow-hidden rounded-2xl border border-hair">
+            <VideoPlayer videoId={video.id} />
+          </div>
+        )}
+      </div>
 
-      <div className="flex flex-wrap items-start justify-between gap-4">
+      <div className="mt-8 grid gap-10 md:grid-cols-[1fr_280px]">
         <div>
-          <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-semibold">{video.title}</h1>
-            {video.is_locked && (
-              <span className="inline-flex items-center gap-1 rounded-full bg-amber-500/15 px-2 py-0.5 text-xs text-amber-300">
-                <Crown className="h-3 w-3" /> Premium
+          <div className="flex flex-wrap items-center gap-2">
+            {video.category && <Badge tone="ghost">{video.category}</Badge>}
+            {video.is_locked && <Badge tone="gold" icon={Crown}>Premium</Badge>}
+            {video.duration_seconds != null && (
+              <span className="font-mono text-[11px] uppercase tracking-[0.1em] text-white/40">
+                {formatDuration(video.duration_seconds)}
               </span>
             )}
           </div>
-          {video.category && (
-            <p className="mt-1 text-sm text-white/60">{video.category}</p>
+          <h1 className="mt-4 font-display text-3xl font-bold leading-[1.02] tracking-editorial-xl md:text-[42px]">
+            {video.title}
+          </h1>
+          {video.description && (
+            <p className="mt-4 max-w-[640px] text-[15px] leading-relaxed text-white/60">
+              {video.description}
+            </p>
           )}
         </div>
+
+        {locked && (
+          <aside className="rounded-2xl border border-gold-400/20 bg-white/[0.03] p-5">
+            <p className="mono-label text-gold-400">Qué obtienes al suscribirte</p>
+            <ul className="mt-4 space-y-2 text-[13.5px] text-white/80">
+              <li className="flex items-start gap-2">
+                <Dot className="mt-0.5 h-4 w-4 shrink-0 text-brand-500" />
+                Todo el catálogo Premium
+              </li>
+              <li className="flex items-start gap-2">
+                <Dot className="mt-0.5 h-4 w-4 shrink-0 text-brand-500" />
+                Nuevas sesiones cada semana
+              </li>
+              <li className="flex items-start gap-2">
+                <Dot className="mt-0.5 h-4 w-4 shrink-0 text-brand-500" />
+                Sesiones 1-a-1 con Erickson
+              </li>
+              <li className="flex items-start gap-2">
+                <Dot className="mt-0.5 h-4 w-4 shrink-0 text-brand-500" />
+                Cancela cuando quieras
+              </li>
+            </ul>
+          </aside>
+        )}
       </div>
-
-      {video.description && (
-        <p className="max-w-3xl text-white/70 leading-relaxed">{video.description}</p>
-      )}
-
-      {locked && (
-        <GlassCard className="max-w-3xl border-amber-500/20">
-          <p className="text-sm text-white/70">
-            Al suscribirte accedes a este vídeo y a todo el catálogo premium. Puedes cancelar cuando quieras.
-          </p>
-        </GlassCard>
-      )}
     </div>
   );
 }

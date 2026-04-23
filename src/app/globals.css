@@ -8,39 +8,77 @@
 
 html, body {
   @apply bg-ink-900 text-white antialiased;
+  font-family: var(--font-body), system-ui, sans-serif;
 }
 
 body {
   background-image:
-    radial-gradient(ellipse 80% 60% at 50% -10%, rgba(239, 68, 68, 0.18), transparent 60%),
-    radial-gradient(ellipse 60% 40% at 90% 110%, rgba(239, 68, 68, 0.10), transparent 60%);
+    radial-gradient(ellipse 60% 40% at 80% -10%, rgba(239, 68, 68, 0.18), transparent 60%),
+    radial-gradient(ellipse 50% 40% at 10% 110%, rgba(239, 68, 68, 0.12), transparent 60%);
   min-height: 100vh;
 }
 
+details summary::-webkit-details-marker { display: none; }
+details summary::marker { display: none; }
+
 @layer components {
   .glass {
-    @apply bg-white/[0.04] border border-white/10 backdrop-blur-xl shadow-glass;
+    @apply bg-white/[0.035] border border-hair backdrop-blur-xl shadow-glass;
+  }
+  .glass-accent {
+    @apply bg-white/[0.035] border border-brand-500/30 backdrop-blur-xl shadow-glow-lg;
   }
   .glass-hover {
-    @apply transition hover:bg-white/[0.07] hover:border-white/20;
+    @apply transition hover:bg-white/[0.06] hover:border-hair-bright;
+  }
+  .hairline {
+    @apply border-hair;
   }
   .btn {
-    @apply inline-flex items-center justify-center gap-2 rounded-xl px-5 py-2.5 font-medium transition focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500/70 disabled:opacity-50 disabled:pointer-events-none;
+    @apply inline-flex items-center justify-center gap-2 rounded-xl px-[18px] py-3 text-sm font-semibold transition focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500/70 disabled:opacity-50 disabled:pointer-events-none whitespace-nowrap;
+    letter-spacing: -0.005em;
   }
   .btn-primary {
-    @apply btn bg-brand-600 hover:bg-brand-500 text-white shadow-glow;
+    @apply btn bg-brand-500 hover:bg-brand-600 text-white shadow-glow;
   }
   .btn-ghost {
-    @apply btn bg-white/5 hover:bg-white/10 border border-white/10 text-white;
+    @apply btn bg-white/5 hover:bg-white/10 border border-hair text-white;
   }
   .btn-outline {
-    @apply btn border border-white/15 hover:border-white/30 text-white;
+    @apply btn border border-hair-bright hover:border-white/30 text-white bg-transparent;
+  }
+  .btn-gold {
+    @apply btn bg-gold-400 hover:bg-gold-300 text-[#3a2a00] shadow-glow-gold;
+  }
+  .btn-danger {
+    @apply btn border border-brand-500/35 text-brand-300 bg-transparent hover:bg-brand-500/10;
+  }
+  .btn-lg {
+    @apply px-6 py-4 text-[15px];
+  }
+  .btn-sm {
+    @apply px-[14px] py-2 text-[13px];
   }
   .input {
-    @apply w-full rounded-xl bg-white/5 border border-white/10 px-4 py-3 text-white placeholder:text-white/40 focus:outline-none focus:border-brand-500/60 focus:bg-white/[0.07] transition;
+    @apply w-full rounded-xl bg-white/[0.04] border border-hair px-4 py-[14px] text-white placeholder:text-white/40 focus:outline-none focus:border-brand-500/60 focus:bg-white/[0.06] transition;
   }
   .label {
-    @apply block text-sm font-medium text-white/70 mb-1.5;
+    @apply block text-[13px] font-medium text-white/80 mb-2;
+  }
+  .mono-label {
+    @apply font-mono text-[11px] tracking-[0.18em] uppercase text-white/40;
+  }
+  .editorial-hair {
+    @apply border-t border-hair;
+  }
+  .placeholder-photo {
+    background:
+      repeating-linear-gradient(
+        135deg,
+        rgba(239, 68, 68, 0.06) 0 10px,
+        rgba(255, 255, 255, 0.02) 10px 20px
+      ),
+      linear-gradient(135deg, #1a1012, #0d0a0c);
   }
 }
 
