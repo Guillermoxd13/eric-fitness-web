@@ -1,140 +1,222 @@
 # Eric Fitness
 
-Plataforma SaaS de entrenamientos con suscripciones premium.
+Plataforma SaaS de entrenamientos en vídeo de **Erickson Zambrano**. Registro, suscripción y reproducción de rutinas protegidas detrás de un paywall.
 
-**Stack**
-- Next.js 15 (App Router) · React 19 · TypeScript · Tailwind CSS
-- Supabase (Auth + Postgres + RLS)
-- Stripe (Checkout + Billing Portal + Webhooks)
-- Cloudflare Stream (signed URLs, con fallback a YouTube embebido para pruebas)
+🌐 **Producción**: https://eric-fitness-web.vercel.app
 
----
+## Stack
 
-## 1. Primera instalación
+- **Next.js 15** (App Router) · **React 19** · **TypeScript** · **Tailwind CSS 3**
+- **Supabase** — auth + Postgres + Row Level Security
+- **Stripe** — Checkout + Billing Portal + Webhooks (modo test)
+- **Cloudflare Stream** — URLs firmadas para vídeo protegido (fallback a YouTube embebido para pruebas)
+- **Vercel** — hosting y Web Analytics
+- **Sonner** — toast notifications
+- **Lucide React** — iconos
 
-```bash
-cd eric-fitness
-npm install
-cp .env.local.example .env.local   # (ya viene creado — rellena los huecos vacíos)
-npm run dev
+## Estructura
+
+```
+src/
+├── app/
+│   ├── (auth)/              # /login, /register (redirige a /dashboard si ya logueado)
+│   ├── (protected)/         # /dashboard, /watch/[id], /account — middleware gate
+│   ├── api/
+│   │   ├── account/delete/  # Borra usuario vía service_role
+│   │   ├── stripe/          # checkout, portal, webhook
+│   │   └── video/[id]/signed-url/  # Firma Cloudflare o embed YouTube
+│   ├── auth/callback/       # Intercambio de código OAuth/magic link
+│   ├── legal/               # /legal/terminos, /legal/privacidad
+│   ├── pricing/             # Planes + checkout
+│   ├── icon.tsx             # Favicon generado dinámicamente
+│   ├── apple-icon.tsx       # Icono iOS home-screen
+│   ├── opengraph-image.tsx  # OG image para redes sociales
+│   ├── sitemap.ts           # Sitemap.xml
+│   ├── robots.ts            # Robots.txt
+│   ├── not-found.tsx        # 404 personalizada
+│   ├── error.tsx            # Error boundary global
+│   └── page.tsx             # Landing con hero + features + FAQ + CTA
+├── components/
+│   ├── Navbar.tsx           # Server component, auth-aware
+│   ├── MobileMenu.tsx       # Hamburguesa para <md
+│   ├── Footer.tsx
+│   ├── VideoPlayer.tsx      # Client, pide signed-url al API
+│   └── LogoutButton.tsx
+├── lib/
+│   ├── supabase/            # client, server, middleware (SSR) y service_role
+│   ├── stripe/              # Cliente lazy
+│   └── cloudflare/stream.ts # Firma JWT local con fallback a REST
+└── types/database.ts        # Tipos Profile + Video
+
+supabase/migrations/
+├── 0001_init_profiles_videos.sql    # Schema + RLS + triggers
+├── 0002_seed_example_videos.sql     # Seed opcional con 4 YouTube dummies
+├── 0003_open_video_previews.sql     # Abre SELECT a todos (preview)
+├── 0004_seed_real_videos.sql        # Los 6 vídeos reales de Erickson
+└── 0005_video_durations.sql         # Plantilla para rellenar duraciones a mano
 ```
 
-El `.env.local` ya trae las llaves de Supabase. Solo faltan:
-- `SUPABASE_SERVICE_ROLE_KEY` — Supabase → Project Settings → API → `service_role secret`
-- Stripe (cuando las tengas)
-- Cloudflare Stream (cuando las tengas)
+## Modelo de seguridad
 
-Mientras no pongas Stripe, el checkout devolverá 500 (esperado).
-Mientras no pongas Cloudflare, los vídeos `provider='youtube'` reproducen perfectamente (placeholder).
+Este es el punto más importante del proyecto. Leer con atención.
 
----
+### RLS permisiva en SELECT, gate real en la API
 
-## 2. Migraciones SQL
-
-Abre Supabase → **SQL Editor** → pega el contenido de:
-
-1. `supabase/migrations/0001_init_profiles_videos.sql` — crea/actualiza tablas, RLS y triggers.
-2. `supabase/migrations/0002_seed_example_videos.sql` — *opcional*, inserta 4 vídeos de ejemplo (YouTube) para poder ver la UI.
-
-Las migraciones son **idempotentes** (`IF NOT EXISTS`, policies con `DROP` previo). Seguras de re-ejecutar.
-
-### El contrato de seguridad
-
-La tabla `videos` tiene una única política de SELECT:
+La tabla `videos` tiene una única policy de SELECT:
 
 ```sql
-is_locked = false
-OR (auth.uid() IS NOT NULL AND public.is_active_premium(auth.uid()))
+using (true)  -- cualquiera ve las filas (autenticado o anon)
 ```
 
-Esto significa: **un usuario sin `is_premium = true` activo no puede leer ni una sola fila bloqueada** — ni el `video_id`, ni el título, nada. El filtro es a nivel de Postgres, no de aplicación. Ningún bug en el frontend puede exponerlos.
+Esto es **intencional**: los usuarios no Premium deben *ver* las cards de vídeos bloqueados (thumbnail borrosa + candado dorado + título), no que "no existan". El paywall es comercial, no ocultamiento.
 
-Además, la tabla `profiles` tiene un trigger que **bloquea** que un usuario autenticado modifique `is_premium`, `stripe_customer_id`, `subscription_status` o `current_period_end` desde el cliente. Solo el `service_role` (el webhook de Stripe) puede tocar esos campos.
+La protección real está en `/api/video/[id]/signed-url`:
 
----
+```ts
+if (video.is_locked) {
+  const isPremium = /* profile.is_premium && periodo vigente */;
+  if (!isPremium) return 403;
+}
+```
 
-## 3. Configurar Stripe (modo test)
+Sin esa llamada, **el frontend no obtiene URL reproducible**. Para YouTube devuelve un embed URL con el video_id público — para Cloudflare Stream devuelve un token JWT firmado que expira en 4h. En ambos casos: sin pasar por la API no hay reproducción.
 
-1. Crea un producto "Eric Fitness Premium" en https://dashboard.stripe.com/test/products con dos precios recurrentes (mensual y anual). Copia los IDs `price_...` en `.env.local`.
-2. Copia `sk_test_...` y `pk_test_...` de https://dashboard.stripe.com/test/apikeys.
-3. En local, inicia el escuchador del webhook:
+### Escritura a `videos` denegada por defecto
+
+No existen policies de INSERT/UPDATE/DELETE para `anon` ni `authenticated`, así que RLS las rechaza. Solo el `service_role` (usado por scripts de admin o futuras migraciones) puede modificar el catálogo.
+
+### Campos sensibles del perfil bloqueados
+
+La tabla `profiles` tiene un trigger `profiles_guard_premium_fields` que revierte cualquier cambio que un usuario autenticado intente hacer a `is_premium`, `stripe_customer_id`, `stripe_subscription_id`, `subscription_status` o `current_period_end`. Solo el `service_role` (usado por el webhook de Stripe) puede escribirlos.
+
+### Auto-creación de perfil
+
+El trigger `on_auth_user_created` en `auth.users` llama a `handle_new_user()` para crear automáticamente la fila en `public.profiles` cuando alguien se registra. Si alguien tiene cuenta sin perfil (edge case), migración 0001 incluye backfill.
+
+## Arrancar en local
+
+```bash
+npm install
+cp .env.local.example .env.local     # rellena los huecos
+npm run dev                           # http://localhost:3000
+```
+
+Variables imprescindibles en `.env.local`:
+
+```
+NEXT_PUBLIC_SUPABASE_URL=...
+NEXT_PUBLIC_SUPABASE_ANON_KEY=...
+NEXT_PUBLIC_SITE_URL=http://localhost:3000
+```
+
+Variables opcionales según feature:
+
+| Variable | Para qué | Sin ella... |
+|---|---|---|
+| `SUPABASE_SERVICE_ROLE_KEY` | Webhook Stripe + `/api/account/delete` | Delete de cuenta devuelve 503 |
+| `STRIPE_SECRET_KEY` | Checkout y portal | El botón "Hazte Premium" falla |
+| `STRIPE_WEBHOOK_SECRET` | Validar firma del webhook | Pagos no se propagan a `is_premium` |
+| `STRIPE_PRICE_MONTHLY` / `STRIPE_PRICE_YEARLY` | IDs de Stripe | Checkout 500 |
+| `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` | Solo referencia cliente | No bloquea (no se usa aún) |
+| `CLOUDFLARE_ACCOUNT_ID` / `CLOUDFLARE_STREAM_API_TOKEN` | Vídeos protegidos | Solo van los vídeos con `provider='youtube'` |
+| `CLOUDFLARE_STREAM_SIGNING_KEY_ID` / `_JWK` | Firma JWT local (más rápida) | Falla al REST API si no se configuran |
+
+## Aplicar migraciones SQL
+
+En Supabase → **SQL Editor**, pegar **en orden**:
+
+1. `0001_init_profiles_videos.sql` — schema + RLS + triggers. Seguro re-ejecutar.
+2. `0002_seed_example_videos.sql` — *opcional*, 4 vídeos de ejemplo.
+3. `0003_open_video_previews.sql` — abre SELECT para el patrón preview + candado.
+4. `0004_seed_real_videos.sql` — 6 vídeos reales del canal de Erickson Zambrano.
+5. `0005_video_durations.sql` — plantilla editable para meter duraciones manualmente.
+
+Todas son idempotentes.
+
+## Configurar Stripe (modo test)
+
+1. **Productos**: en https://dashboard.stripe.com/test/products crea "Eric Fitness Premium" con dos precios recurrentes (`€19/mes` y `€149/año`). Copia los `price_...` en `.env.local`.
+2. **Claves**: `sk_test_...` y `pk_test_...` en https://dashboard.stripe.com/test/apikeys.
+3. **Webhook local** (para desarrollo):
    ```bash
    stripe listen --forward-to localhost:3000/api/stripe/webhook
    ```
-   Copia el `whsec_...` que te imprime en `STRIPE_WEBHOOK_SECRET`.
-4. En producción, añade el endpoint `https://TU-DOMINIO/api/stripe/webhook` en Stripe Dashboard → Developers → Webhooks. Eventos mínimos:
+   Copia el `whsec_...` en `STRIPE_WEBHOOK_SECRET`.
+4. **Webhook producción**: Stripe Dashboard → Developers → Webhooks → Add endpoint apuntando a `https://eric-fitness-web.vercel.app/api/stripe/webhook`. Eventos requeridos:
    - `checkout.session.completed`
    - `customer.subscription.created`
    - `customer.subscription.updated`
    - `customer.subscription.deleted`
    - `invoice.payment_failed`
 
----
+## Configurar Cloudflare Stream (opcional)
 
-## 4. Configurar Cloudflare Stream
-
-1. https://dash.cloudflare.com → Stream → copia el **Account ID** (`CLOUDFLARE_ACCOUNT_ID`).
-2. My Profile → API Tokens → Create Token → Permission **Stream: Edit**. Cópialo en `CLOUDFLARE_STREAM_API_TOKEN`.
-3. Genera una clave de firma local (más rápida que la API):
+1. https://dash.cloudflare.com → Stream → copia **Account ID**.
+2. My Profile → API Tokens → Create → permiso **Stream: Edit** → copia el token.
+3. Genera una clave de firma local:
    ```bash
    curl -X POST -H "Authorization: Bearer $CF_TOKEN" \
      "https://api.cloudflare.com/client/v4/accounts/$ACCOUNT_ID/stream/keys"
    ```
-   Guarda el `id` en `CLOUDFLARE_STREAM_SIGNING_KEY_ID` y el `jwk` (completo, JSON como string) en `CLOUDFLARE_STREAM_SIGNING_KEY_JWK`.
-4. En la tabla `videos`, inserta filas con `provider='cloudflare'` y `video_id='<UID-de-Cloudflare>'`.
+   Guarda el `id` y el `jwk` (JSON completo como string) en las env vars.
+4. Inserta vídeos con `provider='cloudflare'` y `video_id='<Cloudflare-UID>'`.
 
-Si no configuras la clave de firma, `lib/cloudflare/stream.ts` usa automáticamente el endpoint REST `/stream/:uid/token` como fallback.
+Si no configuras la clave de firma, [src/lib/cloudflare/stream.ts](src/lib/cloudflare/stream.ts) hace fallback al endpoint REST `/stream/:uid/token`.
 
----
-
-## 5. Rutas
+## Rutas
 
 | Ruta | Acceso | Qué hace |
 |---|---|---|
-| `/` | público | Landing |
-| `/pricing` | público | Planes + checkout |
-| `/login`, `/register` | público | Auth email + contraseña |
+| `/` | público | Landing: hero, features, cómo funciona, FAQ, CTA |
+| `/pricing` | público | Planes mensual/anual, FAQ de pago |
+| `/login`, `/register` | público (redirige si ya logueado) | Auth email + contraseña |
 | `/auth/callback` | público | Intercambio OAuth / magic link |
-| `/dashboard` | autenticado | Grid de vídeos (RLS decide qué se ve) |
-| `/watch/[id]` | autenticado | Reproductor + detalles |
-| `/account` | autenticado | Estado de suscripción + portal Stripe |
-| `/api/video/[id]/signed-url` | autenticado | Devuelve token/embed según provider |
-| `/api/stripe/checkout` | autenticado | Crea sesión Stripe Checkout |
-| `/api/stripe/portal` | autenticado | Abre el Billing Portal |
-| `/api/stripe/webhook` | Stripe | Actualiza `profiles.is_premium` desde eventos |
+| `/legal/terminos`, `/legal/privacidad` | público | Placeholders legales |
+| `/dashboard` | autenticado | Grid con filtro por categoría |
+| `/watch/[id]` | autenticado | Reproductor o preview de pago |
+| `/account` | autenticado | Editar nombre, cambiar password, borrar cuenta, portal Stripe |
+| `/api/video/[id]/signed-url` | autenticado | Token/embed + gate premium |
+| `/api/stripe/checkout` | autenticado | Crea sesión Checkout |
+| `/api/stripe/portal` | autenticado premium | Abre Billing Portal |
+| `/api/stripe/webhook` | Stripe (firma) | Propaga estado de suscripción a `profiles` |
+| `/api/account/delete` | autenticado | Borra auth user (requiere service_role) |
 
----
+## Añadir vídeos
 
-## 6. Añadir un vídeo
-
-Por ahora, desde Supabase → Table Editor → `videos`. Columnas clave:
+Mientras no exista panel admin, usar Supabase → Table Editor → `videos`. Columnas clave:
 
 | Campo | Valor |
 |---|---|
-| `provider` | `cloudflare` (producción) o `youtube` (placeholder) |
-| `video_id` | UID de Cloudflare Stream *o* ID de YouTube |
-| `is_locked` | `true` para vídeos que requieren suscripción |
-| `thumbnail_url` | Para YouTube: `https://i.ytimg.com/vi/<ID>/maxresdefault.jpg` |
+| `provider` | `youtube` (placeholder) o `cloudflare` (producción) |
+| `video_id` | ID de YouTube (ej. `dQw4w9WgXcQ`) o UID de Cloudflare Stream |
+| `thumbnail_url` | YouTube: `https://i.ytimg.com/vi/<ID>/maxresdefault.jpg` |
+| `is_locked` | `true` = Premium · `false` = gratuito |
+| `category` | Texto libre: `Pecho`, `Piernas`, `HIIT`, etc. Genera chip automático en el filtro |
 | `position` | Orden en el grid (menor primero) |
+| `duration_seconds` | Opcional. Si está null, la card no muestra badge de duración |
 
-Más adelante conviene un panel admin; de momento Supabase Table Editor hace el trabajo sin riesgo.
+## Desplegar
 
----
+El proyecto está conectado a Vercel con auto-deploy desde `main`. Cada `git push origin main` redespliega en ~90s.
 
-## 7. Deploy
+Para un fork desde cero:
 
-**Vercel** es el camino directo:
-1. Push a un repo.
-2. Importa en Vercel, añade todas las variables de `.env.local` en Project → Settings → Environment Variables.
-3. `NEXT_PUBLIC_SITE_URL` debe apuntar a tu dominio final en prod.
-4. Crea el webhook Stripe apuntando a `/api/stripe/webhook` del dominio de Vercel.
+1. **GitHub** → crear repo vacío privado.
+2. `git remote add origin <url>` · `git push -u origin main`.
+3. **Vercel** → Add New Project → importar el repo → pegar env vars en "Environment Variables" antes de deploy.
+4. Primer deploy te da la URL `eric-fitness-web.vercel.app`.
+5. **Supabase** → Authentication → URL Configuration → añadir URL de Vercel como Site URL y `https://<url>/**` en Redirect URLs.
+6. Configurar webhook de Stripe apuntando al dominio de Vercel (ver sección Stripe).
 
----
-
-## Qué quedó fuera del MVP (extensiones naturales)
+## Lo que queda fuera del MVP
 
 - Panel admin para subir vídeos sin tocar Supabase directamente.
-- Programas / categorías con índice y progreso por usuario.
-- OAuth (Google, Apple) — Supabase lo soporta, solo añade el proveedor.
-- Tests E2E (Playwright) del flujo checkout→webhook→premium→reproducción.
-- Analytics de reproducción (Cloudflare Stream ya expone métricas).
+- Programas estructurados (semanas, rutinas encadenadas, progreso del usuario).
+- OAuth Google/Apple (Supabase lo soporta, solo falta activar en su dashboard).
+- Tests E2E (Playwright) del flujo checkout → webhook → premium → reproducción.
+- Dominio propio (actualmente en `*.vercel.app`).
+- Emails transaccionales custom (welcome, reminders) vía Resend o similar.
+
+## Licencia
+
+Propietario — Erickson Zambrano. Ver [/legal/terminos](src/app/legal/terminos/page.tsx).
