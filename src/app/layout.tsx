@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Analytics } from "@vercel/analytics/next";
+import { Toaster } from "sonner";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import "./globals.css";
@@ -47,6 +48,15 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <Navbar />
         <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-10">{children}</main>
         <Footer />
+        <Toaster
+          theme="dark"
+          position="top-right"
+          toastOptions={{
+            classNames: {
+              toast: "border border-white/10 bg-ink-900/90 backdrop-blur",
+            },
+          }}
+        />
         <Analytics />
       </body>
     </html>

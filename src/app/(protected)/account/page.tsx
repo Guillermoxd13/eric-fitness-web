@@ -1,6 +1,9 @@
 import { createClient } from "@/lib/supabase/server";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { PortalButton } from "./PortalButton";
+import { ProfileForm } from "./ProfileForm";
+import { PasswordForm } from "./PasswordForm";
+import { DeleteAccount } from "./DeleteAccount";
 import { Crown } from "lucide-react";
 import type { Profile } from "@/types/database";
 
@@ -24,21 +27,18 @@ export default async function AccountPage() {
     !!profile?.is_premium &&
     (!profile.current_period_end || new Date(profile.current_period_end) > new Date());
 
+  const email = profile?.email ?? user?.email ?? "";
+
   return (
     <div className="mx-auto max-w-2xl space-y-6">
       <h1 className="text-3xl font-semibold">Mi cuenta</h1>
 
-      <GlassCard className="space-y-4">
-        <div className="grid gap-3 sm:grid-cols-2">
-          <div>
-            <p className="text-xs uppercase tracking-wide text-white/50">Nombre</p>
-            <p className="font-medium">{profile?.full_name ?? "—"}</p>
-          </div>
-          <div>
-            <p className="text-xs uppercase tracking-wide text-white/50">Email</p>
-            <p className="font-medium">{profile?.email ?? user?.email ?? "—"}</p>
-          </div>
+      <GlassCard className="space-y-5">
+        <div>
+          <p className="text-xs uppercase tracking-wide text-white/50">Email</p>
+          <p className="font-medium">{email || "—"}</p>
         </div>
+        <ProfileForm userId={user!.id} initialFullName={profile?.full_name ?? ""} />
       </GlassCard>
 
       <GlassCard className={isPremium ? "border-brand-500/30 shadow-glow" : ""}>
@@ -65,6 +65,27 @@ export default async function AccountPage() {
             <a href="/pricing" className="btn-primary">Hazte Premium</a>
           )}
         </div>
+      </GlassCard>
+
+      <GlassCard className="space-y-4">
+        <div>
+          <h2 className="text-lg font-semibold">Cambiar contraseña</h2>
+          <p className="mt-1 text-sm text-white/60">
+            Mínimo 8 caracteres. Cierra sesión en otros dispositivos después de cambiarla.
+          </p>
+        </div>
+        <PasswordForm />
+      </GlassCard>
+
+      <GlassCard className="space-y-4">
+        <div>
+          <h2 className="text-lg font-semibold">Zona peligrosa</h2>
+          <p className="mt-1 text-sm text-white/60">
+            Eliminar la cuenta borra tu perfil y cancela cualquier suscripción activa. La acción no
+            se puede deshacer.
+          </p>
+        </div>
+        <DeleteAccount email={email} />
       </GlassCard>
     </div>
   );
