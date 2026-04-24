@@ -1,21 +1,31 @@
 import Link from "next/link";
+import Image from "next/image";
 import { redirect } from "next/navigation";
 import {
   ArrowRight,
+  Crown,
+  Dot,
   Minus,
   Plus,
   PlayCircle,
   Target,
   Video,
-  Dot,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { Eyebrow } from "@/components/ui/Eyebrow";
 import { Stat } from "@/components/ui/Stat";
 import { Badge } from "@/components/ui/Badge";
-import { Chip } from "@/components/ui/Chip";
 
 export const dynamic = "force-dynamic";
+
+type LandingVideo = {
+  id: string;
+  title: string;
+  thumbnail_url: string | null;
+  duration_seconds: number | null;
+  category: string | null;
+  is_locked: boolean;
+};
 
 const faq = [
   {
@@ -57,17 +67,28 @@ const pillars = [
   },
 ];
 
-const previewVideos = [
-  { t: "Pecho · Bulk season", d: "52 min", cat: "Pecho", ep: "S5 · E12", lock: true, tag: "Nuevo" },
-  { t: "Día de piernas · cuádriceps", d: "48 min", cat: "Piernas", ep: "S5 · E11", lock: true },
-  { t: "Espalda · amplitud + grosor", d: "44 min", cat: "Espalda", ep: "S5 · E10", lock: true },
-  { t: "Movilidad · cadera y tobillo", d: "22 min", cat: "Movilidad", ep: "S5 · E09", lock: false },
-];
+function formatMinutes(seconds: number | null): string {
+  if (!seconds) return "";
+  const m = Math.floor(seconds / 60);
+  return `${m} min`;
+}
 
 export default async function LandingPage() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (user) redirect("/dashboard");
+
+  // Fetch real catalog for the "últimas sesiones" preview and hero stats.
+  const { data: videos } = await supabase
+    .from("videos")
+    .select("id, title, thumbnail_url, duration_seconds, category, is_locked")
+    .order("position", { ascending: true })
+    .returns<LandingVideo[]>();
+
+  const videoList = videos ?? [];
+  const totalCount = videoList.length;
+  const categoryCount = new Set(videoList.map((v) => v.category).filter(Boolean)).size;
+  const previewVideos = videoList.slice(0, 4);
 
   return (
     <>
@@ -77,7 +98,7 @@ export default async function LandingPage() {
           <div className="flex flex-col justify-between gap-12 px-6 py-14 md:px-10 md:py-20">
             <div className="space-y-8">
               <div className="flex items-center gap-4">
-                <Eyebrow num={1}>Temporada 05 · En emisión</Eyebrow>
+                <Eyebrow num={1}>En emisión · 2026</Eyebrow>
                 <span className="hidden h-px flex-1 bg-hair md:block" />
                 <span className="hidden font-mono text-[11px] uppercase tracking-[0.18em] text-white/40 md:block">
                   MAD · 2026
@@ -103,8 +124,16 @@ export default async function LandingPage() {
             </div>
 
             <div className="grid grid-cols-3 gap-6 md:flex md:flex-wrap md:gap-8">
-              <Stat value="42" label="Sesiones" sub="grabadas en HD" />
-              <Stat value="5" label="Programas" sub="por objetivo" />
+              <Stat
+                value={totalCount}
+                label="Sesiones"
+                sub={totalCount > 0 ? "disponibles en HD" : "próximamente"}
+              />
+              <Stat
+                value={categoryCount || "—"}
+                label="Categorías"
+                sub="por objetivo"
+              />
               <Stat value="19€" label="Mensual" sub="cancelas cuando quieras" />
             </div>
           </div>
@@ -113,7 +142,7 @@ export default async function LandingPage() {
             <div className="placeholder-photo absolute inset-0" aria-hidden />
             <div className="absolute left-4 top-4 md:left-6 md:top-6">
               <Badge tone="red" icon={Dot}>
-                En directo · S5 E12
+                Nueva sesión cada semana
               </Badge>
             </div>
             <div className="absolute inset-x-4 bottom-4 flex items-center justify-between font-mono text-[11px] uppercase tracking-[0.12em] text-white/60 md:inset-x-6 md:bottom-6">
@@ -159,31 +188,29 @@ export default async function LandingPage() {
         </div>
       </section>
 
-      {/* ── 03 · ESTA SEMANA ─────────────────────────────── */}
-      <section className="border-b border-hair">
-        <div className="mx-auto max-w-6xl px-6 py-20 md:px-10 md:py-24">
-          <div className="flex flex-col items-start justify-between gap-6 md:flex-row md:items-end">
-            <div>
-              <Eyebrow num={3}>Esta semana en el catálogo</Eyebrow>
-              <h2 className="mt-5 font-display text-4xl font-bold leading-[1] tracking-editorial-xl md:text-[52px]">
-                S5 · Semana 12
-              </h2>
+      {/* ── 03 · CATÁLOGO ─────────────────────────────── */}
+      {previewVideos.length > 0 && (
+        <section className="border-b border-hair">
+          <div className="mx-auto max-w-6xl px-6 py-20 md:px-10 md:py-24">
+            <div className="flex flex-col items-start justify-between gap-6 md:flex-row md:items-end">
+              <div>
+                <Eyebrow num={3}>Del catálogo</Eyebrow>
+                <h2 className="mt-5 font-display text-4xl font-bold leading-[1] tracking-editorial-xl md:text-[52px]">
+                  Últimas sesiones.
+                </h2>
+              </div>
+              <Link href="/register" className="btn-outline btn-sm">
+                Ver todas <ArrowRight className="h-3.5 w-3.5" />
+              </Link>
             </div>
-            <div className="flex flex-wrap gap-2">
-              <Chip active>Todos</Chip>
-              <Chip>Pecho</Chip>
-              <Chip>Piernas</Chip>
-              <Chip>Espalda</Chip>
-              <Chip>Movilidad</Chip>
+            <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+              {previewVideos.map((v) => (
+                <PreviewVideoCard key={v.id} v={v} />
+              ))}
             </div>
           </div>
-          <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {previewVideos.map((v) => (
-              <PreviewVideoCard key={v.t} v={v} />
-            ))}
-          </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* ── 04 · SOBRE ERICKSON ──────────────────────────── */}
       <section id="sobre" className="border-b border-hair">
@@ -207,22 +234,14 @@ export default async function LandingPage() {
             </h2>
             <div className="max-w-md space-y-4 text-base leading-relaxed text-white/60">
               <p>
-                Llevo seis años documentando mi propio proceso. Eric/Fit es ese método ordenado en
-                una plataforma seria: por semanas, por objetivos, con la misma exigencia con la que
-                yo entreno.
+                Llevo años documentando mi propio proceso. Eric/Fit es ese método ordenado en una
+                plataforma seria: por semanas, por objetivos, con la misma exigencia con la que yo
+                entreno.
               </p>
               <p>
                 No vas a ver abs en 7 días. Vas a ver una progresión honesta — la misma que llevo
-                aplicando desde 2019.
+                aplicando desde siempre.
               </p>
-            </div>
-            <div className="flex border-y border-hair py-5">
-              <div className="flex-1 border-r border-hair pr-5">
-                <Stat value="6 AÑOS" label="Entrenando en cámara" size="sm" />
-              </div>
-              <div className="flex-1 pl-5">
-                <Stat value="380K" label="Comunidad activa" size="sm" />
-              </div>
             </div>
           </div>
         </div>
@@ -288,53 +307,62 @@ export default async function LandingPage() {
   );
 }
 
-function PreviewVideoCard({
-  v,
-}: {
-  v: { t: string; d: string; cat: string; ep: string; lock: boolean; tag?: string };
-}) {
+function PreviewVideoCard({ v }: { v: LandingVideo }) {
   return (
     <div className="overflow-hidden rounded-2xl border border-hair bg-white/[0.03]">
-      <div className="relative">
-        <div
-          className={`placeholder-photo aspect-video ${v.lock ? "brightness-75 blur-[6px]" : ""}`}
-          aria-hidden
-        />
-        {v.lock && (
+      <div className="relative aspect-video w-full overflow-hidden bg-ink-700">
+        {v.thumbnail_url ? (
+          <Image
+            src={v.thumbnail_url}
+            alt={v.title}
+            fill
+            sizes="(max-width: 768px) 100vw, 25vw"
+            className={`object-cover ${v.is_locked ? "scale-110 blur-md brightness-75" : ""}`}
+          />
+        ) : (
+          <div className="placeholder-photo absolute inset-0" aria-hidden />
+        )}
+        {v.is_locked && (
           <div className="absolute inset-0 grid place-items-center">
             <div className="rounded-full border border-gold-400/40 bg-black/50 p-3 backdrop-blur">
-              <svg viewBox="0 0 24 24" className="h-5 w-5 text-gold-400" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+              <svg
+                viewBox="0 0 24 24"
+                className="h-5 w-5 text-gold-400"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.75"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
                 <rect x="4" y="10" width="16" height="11" rx="2" />
                 <path d="M8 10V7a4 4 0 0 1 8 0v3" />
               </svg>
             </div>
           </div>
         )}
-        <div className="absolute inset-x-2 top-2 flex items-start justify-between">
-          <span className="rounded bg-black/50 px-2 py-1 font-mono text-[10.5px] uppercase tracking-[0.1em] text-white">
-            {v.ep}
-          </span>
-          {v.lock ? (
-            <Badge tone="gold">Premium</Badge>
+        <div className="absolute right-2 top-2">
+          {v.is_locked ? (
+            <Badge tone="gold" icon={Crown}>
+              Premium
+            </Badge>
           ) : (
             <Badge tone="green">Gratis</Badge>
           )}
         </div>
-        {v.tag && (
-          <span className="absolute bottom-2 left-2 rounded border border-brand-500/30 bg-brand-500/15 px-2 py-0.5 font-mono text-[10px] font-semibold uppercase tracking-[0.1em] text-brand-300">
-            {v.tag}
-          </span>
-        )}
       </div>
       <div className="p-4">
         <div className="flex items-center justify-between">
           <span className="font-mono text-[10.5px] uppercase tracking-[0.1em] text-white/40">
-            {v.cat}
+            {v.category ?? "General"}
           </span>
-          <span className="font-mono text-[11px] text-white/60">{v.d}</span>
+          {v.duration_seconds != null && (
+            <span className="font-mono text-[11px] text-white/60">
+              {formatMinutes(v.duration_seconds)}
+            </span>
+          )}
         </div>
         <h3 className="mt-1.5 font-display text-[15.5px] font-semibold leading-tight tracking-editorial-lg">
-          {v.t}
+          {v.title}
         </h3>
       </div>
     </div>

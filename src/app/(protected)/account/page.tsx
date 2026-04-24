@@ -76,7 +76,7 @@ export default async function AccountPage() {
                 )}
               </div>
               <h3 className="mt-4 font-display text-[28px] font-bold tracking-editorial-lg">
-                {isPremium ? (profile?.subscription_status ?? "Plan activo") : "Sin suscripción"}
+                {isPremium ? "Plan Premium" : "Plan gratuito"}
               </h3>
               {profile?.current_period_end && (
                 <p className="mt-1 text-[13px] text-white/60">

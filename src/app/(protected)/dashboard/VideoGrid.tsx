@@ -80,10 +80,9 @@ export function VideoGrid({
         </p>
       ) : (
         <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {filtered.map((v, i) => {
+          {filtered.map((v) => {
             const locked = v.is_locked && !isPremium;
             const href = locked ? "/pricing?locked=1" : `/watch/${v.id}`;
-            const episode = `S5 · E${String(videos.length - i).padStart(2, "0")}`;
             return (
               <Link
                 key={v.id}
@@ -129,10 +128,7 @@ export function VideoGrid({
                     </div>
                   )}
 
-                  <div className="absolute inset-x-2 top-2 flex items-start justify-between gap-2">
-                    <span className="rounded bg-black/50 px-2 py-1 font-mono text-[10.5px] uppercase tracking-[0.1em] text-white backdrop-blur">
-                      {episode}
-                    </span>
+                  <div className="absolute right-2 top-2">
                     {v.is_locked ? <Badge tone="gold" icon={Crown}>Premium</Badge> : <Badge tone="green">Gratis</Badge>}
                   </div>
                 </div>

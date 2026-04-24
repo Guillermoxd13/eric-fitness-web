@@ -26,9 +26,9 @@ const slots = [
 ];
 
 const upcoming = [
-  { d: "14 MAR", h: "19:00", t: "Revisión · Sentadilla", live: true },
-  { d: "21 MAR", h: "19:00", t: "Programación · Bulk Q2" },
-  { d: "28 MAR", h: "18:00", t: "Dudas · Nutrición" },
+  { d: "14 MAY", h: "19:00", t: "Revisión · Sentadilla", live: true },
+  { d: "21 MAY", h: "19:00", t: "Programación · Bulk Q2" },
+  { d: "28 MAY", h: "18:00", t: "Dudas · Nutrición" },
 ];
 
 export default async function CoachingPage() {
@@ -63,10 +63,21 @@ export default async function CoachingPage() {
         <div className="flex flex-wrap gap-2">
           <Chip active>Calendario</Chip>
           <Chip>
-            Mis sesiones <span className="opacity-60">3</span>
+            Mis sesiones <span className="opacity-60">0</span>
           </Chip>
         </div>
       </div>
+
+      {/* Honest preview disclaimer */}
+      {isPremium && (
+        <div className="mt-8 rounded-xl border border-white/10 bg-white/[0.02] px-4 py-3 text-[13px] text-white/60">
+          <span className="font-mono text-[11px] uppercase tracking-[0.12em] text-white/40">
+            Vista previa ·{" "}
+          </span>
+          La reserva real estará disponible pronto. Las fechas y slots mostrados son ilustrativos
+          del flujo final.
+        </div>
+      )}
 
       {!isPremium && (
         <div className="mt-10 overflow-hidden rounded-2xl border border-gold-400/30 bg-gold-400/[0.04] p-6">
