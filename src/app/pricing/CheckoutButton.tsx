@@ -1,7 +1,9 @@
 "use client";
 
+import { ArrowRight } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { toast } from "sonner";
 
 export function CheckoutButton({
   plan,
@@ -12,7 +14,6 @@ export function CheckoutButton({
 }) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
   async function onClick() {
     if (!isLoggedIn) {
@@ -20,7 +21,6 @@ export function CheckoutButton({
       return;
     }
     setLoading(true);
-    setError(null);
     try {
       const res = await fetch("/api/stripe/checkout", {
         method: "POST",
@@ -31,17 +31,16 @@ export function CheckoutButton({
       if (!res.ok) throw new Error(body.error ?? "Error iniciando el checkout.");
       window.location.href = body.url;
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Error desconocido.");
+      const message = e instanceof Error ? e.message : "Error desconocido.";
+      toast.error(message);
       setLoading(false);
     }
   }
 
   return (
-    <div>
-      <button onClick={onClick} disabled={loading} className="btn-primary w-full">
-        {loading ? "Redirigiendo…" : isLoggedIn ? "Suscribirme" : "Crear cuenta"}
-      </button>
-      {error && <p className="mt-2 text-sm text-brand-400">{error}</p>}
-    </div>
+    <button onClick={onClick} disabled={loading} className="btn-primary btn-lg w-full">
+      {loading ? "Redirigiendo…" : isLoggedIn ? "Suscribirme" : "Crear cuenta"}
+      <ArrowRight className="h-4 w-4" />
+    </button>
   );
 }

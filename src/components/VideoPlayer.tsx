@@ -38,12 +38,16 @@ export function VideoPlayer({ videoId }: { videoId: string }) {
 
   if (locked) {
     return (
-      <div className="glass grid aspect-video w-full place-items-center rounded-2xl border-brand-500/30 p-6 text-center">
+      <div className="grid aspect-video w-full place-items-center bg-ink-800 p-6 text-center">
         <div>
-          <Lock className="mx-auto h-8 w-8 text-brand-400" />
-          <p className="mt-3 font-semibold">Vídeo Premium</p>
+          <div className="mx-auto grid h-16 w-16 place-items-center rounded-full border border-gold-400/40 bg-black/50 backdrop-blur">
+            <Lock className="h-7 w-7 text-gold-400" strokeWidth={2} />
+          </div>
+          <p className="mt-4 font-display text-xl font-bold tracking-editorial-lg">Vídeo Premium</p>
           <p className="mt-1 text-sm text-white/60">Suscríbete para desbloquear este contenido.</p>
-          <Link href="/pricing" className="btn-primary mt-4 inline-flex">Ver planes</Link>
+          <Link href="/pricing" className="btn-gold mt-5 inline-flex">
+            Ver planes
+          </Link>
         </div>
       </div>
     );
@@ -51,9 +55,9 @@ export function VideoPlayer({ videoId }: { videoId: string }) {
 
   if (error) {
     return (
-      <div className="glass grid aspect-video w-full place-items-center rounded-2xl p-6 text-center">
+      <div className="grid aspect-video w-full place-items-center bg-ink-800 p-6 text-center">
         <div>
-          <p className="font-semibold">No podemos reproducir este vídeo.</p>
+          <p className="font-display font-semibold">No podemos reproducir este vídeo.</p>
           <p className="mt-1 text-sm text-white/60">{error}</p>
         </div>
       </div>
@@ -61,21 +65,19 @@ export function VideoPlayer({ videoId }: { videoId: string }) {
   }
 
   if (!data) {
-    return <div className="glass aspect-video w-full animate-pulse rounded-2xl" />;
+    return <div className="aspect-video w-full animate-pulse bg-ink-800" />;
   }
 
   const src = data.provider === "youtube" ? data.embedUrl : data.iframeUrl;
 
   return (
-    <div className="glass overflow-hidden rounded-2xl">
-      <div className="relative aspect-video w-full">
-        <iframe
-          src={src}
-          className="absolute inset-0 h-full w-full"
-          allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture"
-          allowFullScreen
-        />
-      </div>
+    <div className="relative aspect-video w-full bg-black">
+      <iframe
+        src={src}
+        className="absolute inset-0 h-full w-full"
+        allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture"
+        allowFullScreen
+      />
     </div>
   );
 }
