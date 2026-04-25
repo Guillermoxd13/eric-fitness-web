@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight, CheckCircle2, Crown, Dot, PlayCircle, Search, Video } from "lucide-react";
+import { ArrowRight, CheckCircle2, Crown, Dot, PlayCircle, Video } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { Eyebrow } from "@/components/ui/Eyebrow";
 import { Badge } from "@/components/ui/Badge";
@@ -43,25 +43,16 @@ export default async function DashboardPage({
   return (
     <div className="mx-auto max-w-6xl px-6 py-12 md:px-10 md:py-16">
       {/* Header */}
-      <div className="flex flex-col gap-8 md:flex-row md:items-end md:justify-between">
-        <div>
-          <Eyebrow>Biblioteca</Eyebrow>
-          <h1 className="mt-4 font-display text-4xl font-bold leading-[1] tracking-editorial-display md:text-[56px]">
-            Hola{firstName ? `, ${firstName}` : ""}.
-          </h1>
-          <p className="mt-2 text-white/60">
-            {isPremium
-              ? `Acceso completo · ${videoList.length} sesiones disponibles`
-              : `Acceso gratuito · ${videoList.filter((v) => !v.is_locked).length} de ${videoList.length} sesiones desbloqueadas`}
-          </p>
-        </div>
-        <div className="hidden items-center gap-2 rounded-xl border border-hair bg-white/[0.03] px-3.5 py-2.5 md:flex">
-          <Search className="h-4 w-4 text-white/40" />
-          <span className="text-[13px] text-white/40">Buscar en el catálogo…</span>
-          <span className="rounded border border-hair px-1.5 py-0.5 font-mono text-[10.5px] text-white/40">
-            ⌘ K
-          </span>
-        </div>
+      <div>
+        <Eyebrow>Biblioteca</Eyebrow>
+        <h1 className="mt-4 font-display text-4xl font-bold leading-[1] tracking-editorial-display md:text-[56px]">
+          Hola{firstName ? `, ${firstName}` : ""}.
+        </h1>
+        <p className="mt-2 text-white/60">
+          {isPremium
+            ? `Acceso completo · ${videoList.length} sesiones disponibles`
+            : `Acceso gratuito · ${videoList.filter((v) => !v.is_locked).length} de ${videoList.length} sesiones desbloqueadas`}
+        </p>
       </div>
 
       {/* Success banner */}
