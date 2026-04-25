@@ -30,16 +30,19 @@ export function Footer() {
         <FooterColumn title="Redes">
           <div className="flex items-center gap-2">
             <SocialLink
-              href="https://www.youtube.com/@EricksonZambrano"
-              label="YouTube"
+              href="https://www.youtube.com/@erick4trainer"
+              label="YouTube · @erick4trainer"
               icon={<Youtube className="h-4 w-4" />}
             />
             <SocialLink
-              href="https://www.instagram.com/"
-              label="Instagram"
+              href="https://www.instagram.com/erick4trainer"
+              label="Instagram · @erick4trainer"
               icon={<Instagram className="h-4 w-4" />}
             />
           </div>
+          <p className="mt-3 font-mono text-[11px] uppercase tracking-[0.12em] text-white/40">
+            @erick4trainer
+          </p>
         </FooterColumn>
       </div>
 
