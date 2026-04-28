@@ -61,7 +61,14 @@ export default function TerminosPage() {
       </div>
 
       <p className="mt-14 text-sm text-white/50">
-        ¿Dudas? Contacta con nosotros por nuestras redes sociales.
+        ¿Dudas? Escríbenos a{" "}
+        <a
+          href="mailto:ericksonza9@gmail.com"
+          className="text-brand-500 underline transition hover:text-brand-300"
+        >
+          ericksonza9@gmail.com
+        </a>{" "}
+        o por nuestras redes sociales.
       </p>
     </article>
   );

@@ -46,8 +46,14 @@ const sections = [
     body: (
       <p>
         Puedes pedir en cualquier momento acceso, rectificación o borrado de tus datos escribiéndonos
-        por nuestras redes sociales. Borraremos tu cuenta y datos asociados en un máximo de 30 días
-        tras la solicitud.
+        a{" "}
+        <a
+          href="mailto:ericksonza9@gmail.com"
+          className="text-brand-500 underline transition hover:text-brand-300"
+        >
+          ericksonza9@gmail.com
+        </a>
+        . Borraremos tu cuenta y datos asociados en un máximo de 30 días tras la solicitud.
       </p>
     ),
   },

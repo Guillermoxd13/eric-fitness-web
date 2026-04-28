@@ -1,8 +1,14 @@
 # Eric Fitness
 
-Plataforma SaaS de entrenamientos en vídeo de **Erickson Zambrano**. Registro, suscripción y reproducción de rutinas protegidas detrás de un paywall.
+Plataforma SaaS de **Erickson Zambrano**. Catálogo de entrenamientos en vídeo + áreas de mentalidad, hábitos y nutrición + sesiones grupales mensuales y 1-a-1 privadas. Modelo de suscripción (mensual/anual) en USD con add-on de pago por sesión.
 
 🌐 **Producción**: https://eric-fitness-web.vercel.app
+
+**Precios actuales**:
+- Mensual: $19.99 USD
+- Anual: $179.99 USD (~$14.99/mes equivalente)
+- Sesión 1-a-1: $49.99 USD por sesión (add-on)
+- Llamada grupal mensual: incluida en cualquier plan
 
 ## Stack
 
@@ -135,7 +141,7 @@ Todas son idempotentes.
 
 ## Configurar Stripe (modo test)
 
-1. **Productos**: en https://dashboard.stripe.com/test/products crea "Eric Fitness Premium" con dos precios recurrentes (`€19/mes` y `€149/año`). Copia los `price_...` en `.env.local`.
+1. **Productos**: en https://dashboard.stripe.com/test/products crea "Eric Fitness Premium" con dos precios recurrentes (`$19.99/mes` y `$179.99/año` — moneda USD). Copia los `price_...` en `.env.local`. Crea también un producto adicional "Sesión 1-a-1" como pago único de `$49.99` cuando vayamos a wirearlo.
 2. **Claves**: `sk_test_...` y `pk_test_...` en https://dashboard.stripe.com/test/apikeys.
 3. **Webhook local** (para desarrollo):
    ```bash

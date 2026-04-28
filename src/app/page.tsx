@@ -3,13 +3,15 @@ import Image from "next/image";
 import { redirect } from "next/navigation";
 import {
   ArrowRight,
+  Brain,
   Crown,
   Dot,
   Minus,
   Plus,
   PlayCircle,
+  Salad,
   Target,
-  Video,
+  Users,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { Eyebrow } from "@/components/ui/Eyebrow";
@@ -49,21 +51,39 @@ const faq = [
 const pillars = [
   {
     n: "01",
-    t: "Programas por objetivo",
-    d: "Hipertrofia, fuerza y estética. Rutinas organizadas en semanas progresivas, no vídeos sueltos.",
+    t: "Entrenamiento por objetivo",
+    d: "Hipertrofia, fuerza y estética. Rutinas progresivas por grupo muscular, no vídeos sueltos.",
     icon: Target,
   },
   {
     n: "02",
-    t: "Vídeo HD sin anuncios",
-    d: "Reproducción limpia. Técnica explicada plano a plano.",
-    icon: PlayCircle,
+    t: "Mentalidad, hábitos, nutrición",
+    d: "El método no son solo pesas. Cubrimos qué piensas, qué comes y qué haces a diario.",
+    icon: Brain,
   },
   {
     n: "03",
-    t: "Sesiones 1-a-1 en vivo",
-    d: "Corrección de técnica con Erickson por videollamada. Plazas limitadas cada semana.",
-    icon: Video,
+    t: "Llamada grupal mensual",
+    d: "Cada mes, sesión grupal en directo con Erickson. Incluida en cualquier plan.",
+    icon: Users,
+  },
+];
+
+const focusAreas = [
+  {
+    icon: Target,
+    title: "Entrenamiento",
+    body: "Pecho, espalda, piernas, hombros, brazos, core, HIIT y movilidad.",
+  },
+  {
+    icon: Brain,
+    title: "Mentalidad y hábitos",
+    body: "Cómo cambiar lo que piensas, cómo construir hábitos que aguantan.",
+  },
+  {
+    icon: Salad,
+    title: "Nutrición",
+    body: "Perder grasa, mantener peso o ganar masa — sin dietas imposibles.",
   },
 ];
 
@@ -110,15 +130,15 @@ export default async function LandingPage() {
                 <span className="italic text-brand-500">va en serio</span>.
               </h1>
               <p className="max-w-md text-base leading-relaxed text-white/60 md:text-lg">
-                El método completo de Erickson Zambrano. Fuerza, hipertrofia y movilidad en vídeo
-                HD. Nuevas sesiones cada semana. Cero gurús.
+                El método completo de Erickson Zambrano. Entrenamiento, mentalidad, hábitos y
+                nutrición en vídeo HD. Nuevas sesiones cada mes. Cero gurús.
               </p>
               <div className="flex flex-col items-stretch gap-3 sm:flex-row sm:items-center">
                 <Link href="/register" className="btn-primary btn-lg">
                   Empezar gratis <ArrowRight className="h-4 w-4" />
                 </Link>
                 <Link href="/pricing" className="btn-outline btn-lg">
-                  Ver planes — 19 €/mes
+                  Ver planes — $19.99/mes
                 </Link>
               </div>
             </div>
@@ -134,7 +154,7 @@ export default async function LandingPage() {
                 label="Categorías"
                 sub="por objetivo"
               />
-              <Stat value="19€" label="Mensual" sub="cancelas cuando quieras" />
+              <Stat value="$19.99" label="Mensual" sub="cancelas cuando quieras" />
             </div>
           </div>
 
@@ -184,6 +204,39 @@ export default async function LandingPage() {
                 <p className="mt-3 text-sm leading-relaxed text-white/60">{p.d}</p>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── ÁREAS ───────────────────────────────── */}
+      <section className="border-b border-hair">
+        <div className="mx-auto max-w-6xl px-6 py-20 md:px-10 md:py-24">
+          <div className="grid gap-12 md:grid-cols-[300px_1fr] md:gap-20">
+            <div>
+              <Eyebrow>El método completo</Eyebrow>
+              <h2 className="mt-5 font-display text-4xl font-bold leading-[1] tracking-editorial-xl md:text-[52px]">
+                Tres áreas.<br />
+                Un solo plan.
+              </h2>
+              <p className="mt-5 max-w-sm text-[15px] leading-relaxed text-white/60">
+                Entrenar es solo una parte. Sin la cabeza, los hábitos y la comida bien
+                calibrados, los resultados no aguantan.
+              </p>
+            </div>
+            <div className="grid gap-4 md:grid-cols-3">
+              {focusAreas.map((a) => (
+                <div
+                  key={a.title}
+                  className="rounded-2xl border border-hair bg-white/[0.02] p-6"
+                >
+                  <a.icon className="h-7 w-7 text-brand-500" strokeWidth={1.5} />
+                  <h3 className="mt-5 font-display text-xl font-bold tracking-editorial-lg">
+                    {a.title}
+                  </h3>
+                  <p className="mt-2 text-[14px] leading-relaxed text-white/60">{a.body}</p>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </section>

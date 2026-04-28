@@ -65,7 +65,7 @@ export default async function DashboardPage({
         </div>
       )}
 
-      {/* Próxima 1-a-1 banner */}
+      {/* Próxima llamada grupal banner */}
       {isPremium && (
         <div className="mt-8 overflow-hidden rounded-2xl border border-brand-500/30 bg-gradient-to-r from-brand-500/10 to-brand-500/[0.02] p-5">
           <div className="flex flex-col items-start justify-between gap-4 md:flex-row md:items-center">
@@ -75,21 +75,21 @@ export default async function DashboardPage({
               </div>
               <div>
                 <div className="flex flex-wrap items-center gap-2">
-                  <Badge tone="red" icon={Dot}>Próxima sesión 1-a-1</Badge>
+                  <Badge tone="red" icon={Dot}>Llamada grupal mensual</Badge>
                   <span className="font-mono text-[11px] uppercase tracking-[0.1em] text-white/60">
-                    Agenda la primera en /coaching
+                    Incluida en tu plan
                   </span>
                 </div>
                 <h3 className="mt-2 font-display text-lg font-bold tracking-editorial-lg">
-                  Sesiones 1-a-1 incluidas en tu plan
+                  Sesión grupal con Erickson cada mes
                 </h3>
                 <p className="mt-1 text-[13px] text-white/60">
-                  30 min con Erickson por videollamada · plazas limitadas cada semana
+                  ¿Quieres una sesión 1-a-1 privada? Reserva por $49.99 desde la pestaña Coaching.
                 </p>
               </div>
             </div>
             <Link href="/coaching" className="btn-primary btn-sm">
-              Ver calendario <ArrowRight className="h-3.5 w-3.5" />
+              Ver coaching <ArrowRight className="h-3.5 w-3.5" />
             </Link>
           </div>
         </div>

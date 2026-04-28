@@ -17,13 +17,10 @@ export function Logo({
   return (
     <Link
       href={href}
-      className={`inline-flex items-baseline gap-[4px] font-display font-extrabold leading-none tracking-editorial-lg ${sizes[size]} ${className}`}
+      className={`inline-flex items-baseline gap-1.5 font-display font-extrabold leading-none tracking-editorial-lg ${sizes[size]} ${className}`}
     >
       <span>ERIC</span>
-      <span className="inline-flex items-baseline">
-        <span className="text-brand-500">/</span>
-        <span>FIT</span>
-      </span>
+      <span className="text-brand-500">FITNESS</span>
     </Link>
   );
 }

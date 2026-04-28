@@ -1,5 +1,16 @@
 import Link from "next/link";
-import { ArrowRight, Check, CreditCard, Crown, Lock, ShieldCheck, Sparkles, X } from "lucide-react";
+import {
+  ArrowRight,
+  Check,
+  CreditCard,
+  Crown,
+  Lock,
+  ShieldCheck,
+  Sparkles,
+  Users,
+  Video,
+  X,
+} from "lucide-react";
 import { Eyebrow } from "@/components/ui/Eyebrow";
 import { Badge } from "@/components/ui/Badge";
 import { CheckoutButton } from "./CheckoutButton";
@@ -13,30 +24,40 @@ const plans = [
   {
     id: "monthly" as const,
     name: "Mensual",
-    priceLabel: "19€",
+    priceLabel: "$19.99",
     cadence: "/ mes",
-    perks: ["Acceso total al catálogo", "Nuevas sesiones cada semana", "Cancelas cuando quieras"],
+    perks: [
+      "Acceso total al catálogo",
+      "Mentalidad, hábitos y nutrición incluidos",
+      "Llamada grupal mensual con Erickson",
+      "Cancelas cuando quieras",
+    ],
     highlight: false,
   },
   {
     id: "yearly" as const,
     name: "Anual",
-    priceLabel: "149€",
+    priceLabel: "$179.99",
     cadence: "/ año",
-    sub: "≈ 12,40 € / mes",
-    tag: "Ahorra 35%",
-    perks: ["Todo lo del mensual", "2 meses gratis", "Acceso prioritario a 1-a-1"],
+    sub: "≈ $14.99 / mes",
+    tag: "Ahorra 25%",
+    perks: [
+      "Todo lo del mensual",
+      "Equivalente a 2 meses gratis",
+      "Llamada grupal mensual con Erickson",
+      "Acceso a sesiones 1-a-1 al mejor precio",
+    ],
     highlight: true,
   },
 ];
 
 const compareRows: [string, boolean, boolean][] = [
-  ["Catálogo completo", true, true],
-  ["Vídeos exclusivos de suscriptores", true, true],
+  ["Catálogo completo de entrenamientos", true, true],
+  ["Mentalidad, hábitos y nutrición", true, true],
   ["Sin anuncios ni distracciones", true, true],
-  ["Nuevas rutinas cada semana", true, true],
-  ["Sesión 1-a-1 de bienvenida (30 min)", false, true],
-  ["Acceso prioritario a eventos en vivo", false, true],
+  ["Nuevas sesiones cada mes", true, true],
+  ["Llamada grupal mensual con Erickson", true, true],
+  ["Equivalente a 2 meses gratis", false, true],
 ];
 
 const pricingFaq = [
@@ -46,7 +67,15 @@ const pricingFaq = [
   },
   {
     q: "¿Diferencia entre mensual y anual?",
-    a: "El contenido es el mismo. El anual sale un 35% más barato — para quien ya sabe que va a entrenar todo el año.",
+    a: "El contenido y la llamada grupal son los mismos. El anual sale un 25% más barato — para quien ya sabe que va a entrenar todo el año.",
+  },
+  {
+    q: "¿Qué incluye la llamada grupal mensual?",
+    a: "Una sesión grupal en directo cada mes con Erickson, abierta a todos los suscriptores (mensuales y anuales). Resuelves dudas, planteas tus bloqueos y ves cómo Erickson responde a otros casos como el tuyo.",
+  },
+  {
+    q: "¿Las sesiones 1-a-1 están incluidas?",
+    a: "No. Son un producto aparte a $49.99 por sesión que cualquier suscriptor puede contratar cuando quiera. Esto evita encarecer el plan a quien no las necesita.",
   },
   {
     q: "¿Qué métodos de pago acepta?",
@@ -89,8 +118,8 @@ export default async function PricingPage({
         </h1>
         <p className="mx-auto mt-4 max-w-xl text-[17px] text-white/60">
           {isPremium
-            ? "Tu suscripción está activa. Gracias por apoyar a Eric/Fit."
-            : "Mismo contenido en ambos planes. El anual te sale un 35% más barato."}
+            ? "Tu suscripción está activa. Gracias por apoyar a Eric Fitness."
+            : "Mismo contenido en ambos planes. El anual te sale un 25% más barato."}
         </p>
       </div>
 
@@ -176,8 +205,77 @@ export default async function PricingPage({
             ))}
           </div>
 
+          {/* 1-a-1 add-on */}
+          <section className="mx-auto mt-10 max-w-3xl">
+            <div className="overflow-hidden rounded-2xl border border-gold-400/30 bg-gradient-to-br from-gold-400/[0.05] to-transparent p-6 md:p-8">
+              <div className="flex flex-col gap-6 md:flex-row md:items-start md:justify-between">
+                <div className="flex items-start gap-4">
+                  <div className="grid h-12 w-12 shrink-0 place-items-center rounded-xl border border-gold-400/40 bg-black/30">
+                    <Video className="h-5 w-5 text-gold-400" />
+                  </div>
+                  <div>
+                    <Badge tone="gold">Plus · Pago por sesión</Badge>
+                    <h3 className="mt-3 font-display text-2xl font-bold tracking-editorial-lg md:text-[28px]">
+                      Sesión 1-a-1 con Erickson
+                    </h3>
+                    <p className="mt-2 max-w-md text-[14px] leading-relaxed text-white/70">
+                      Videollamada privada para revisar tu técnica, planificar tu rutina o
+                      resolver dudas que no encajan en la grupal. Pagas solo cuando la usas.
+                    </p>
+                    <ul className="mt-4 space-y-2 text-[13.5px] text-white/70">
+                      <li className="flex items-start gap-2">
+                        <Check className="mt-0.5 h-3.5 w-3.5 shrink-0 text-gold-400" />
+                        Disponible para suscriptores mensuales y anuales
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <Check className="mt-0.5 h-3.5 w-3.5 shrink-0 text-gold-400" />
+                        Agendas la fecha desde tu panel
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <Check className="mt-0.5 h-3.5 w-3.5 shrink-0 text-gold-400" />
+                        Compras por sesión, sin compromiso
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <div className="font-display text-[44px] font-extrabold leading-none tracking-editorial-display text-gold-400">
+                    $49.99
+                  </div>
+                  <div className="font-mono text-[11px] uppercase tracking-[0.1em] text-white/40">
+                    por sesión
+                  </div>
+                </div>
+              </div>
+            </div>
+            <p className="mt-3 text-center font-mono text-[11px] uppercase tracking-[0.1em] text-white/40">
+              Próximamente · Booking abierto en cuanto activemos los pagos.
+            </p>
+          </section>
+
+          {/* Group call highlight */}
+          <section className="mx-auto mt-10 max-w-3xl">
+            <div className="flex items-start gap-4 rounded-2xl border border-brand-500/20 bg-white/[0.02] p-5">
+              <div className="grid h-11 w-11 shrink-0 place-items-center rounded-xl border border-brand-500/30 bg-brand-500/10">
+                <Users className="h-5 w-5 text-brand-500" />
+              </div>
+              <div>
+                <p className="text-[13px] font-semibold uppercase tracking-[0.1em] text-brand-300">
+                  Bonus incluido en cualquier plan
+                </p>
+                <h4 className="mt-1 font-display text-[17px] font-bold tracking-editorial-lg">
+                  Llamada grupal mensual con Erickson
+                </h4>
+                <p className="mt-1 text-[13px] leading-relaxed text-white/60">
+                  Una vez al mes, sesión grupal abierta a todos los suscriptores. Sin coste extra,
+                  da igual el plan que tengas.
+                </p>
+              </div>
+            </div>
+          </section>
+
           {/* Trust strip */}
-          <div className="mx-auto mt-10 max-w-3xl overflow-hidden rounded-2xl border border-hair">
+          <div className="mx-auto mt-12 max-w-3xl overflow-hidden rounded-2xl border border-hair">
             <div className="grid md:grid-cols-3">
               {[
                 { icon: ShieldCheck, t: "Pagos seguros", s: "Gestionados por Stripe" },

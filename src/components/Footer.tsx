@@ -1,6 +1,8 @@
 import Link from "next/link";
-import { Instagram, Youtube } from "lucide-react";
+import { Instagram, Mail, Youtube } from "lucide-react";
 import { Logo } from "./ui/Logo";
+
+const SUPPORT_EMAIL = "ericksonza9@gmail.com";
 
 export function Footer() {
   const year = new Date().getFullYear();
@@ -11,9 +13,16 @@ export function Footer() {
         <div>
           <Logo size="md" />
           <p className="mt-4 max-w-sm text-sm leading-relaxed text-white/60">
-            Entrenamientos del método completo de Erickson Zambrano. Fuerza, hipertrofia y
-            movilidad — en serio.
+            Entrenamientos del método completo de Erickson Zambrano. Fuerza, hipertrofia,
+            movilidad, mentalidad, hábitos y nutrición.
           </p>
+          <a
+            href={`mailto:${SUPPORT_EMAIL}`}
+            className="mt-4 inline-flex items-center gap-2 text-sm text-white/60 transition hover:text-white"
+          >
+            <Mail className="h-3.5 w-3.5" />
+            {SUPPORT_EMAIL}
+          </a>
         </div>
 
         <FooterColumn title="Plataforma">
@@ -49,7 +58,7 @@ export function Footer() {
       <div className="border-t border-hair">
         <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-2 px-6 py-5 text-[11px] uppercase tracking-[0.12em] text-white/40 md:flex-row md:px-8 font-mono">
           <p>TÉRMINOS · PRIVACIDAD · CONTACTO</p>
-          <p>© {year} ERIC/FIT</p>
+          <p>© {year} ERIC FITNESS</p>
         </div>
       </div>
     </footer>

@@ -139,11 +139,11 @@ export default async function WatchPage({
               </li>
               <li className="flex items-start gap-2">
                 <Dot className="mt-0.5 h-4 w-4 shrink-0 text-brand-500" />
-                Nuevas sesiones cada semana
+                Mentalidad, hábitos y nutrición incluidos
               </li>
               <li className="flex items-start gap-2">
                 <Dot className="mt-0.5 h-4 w-4 shrink-0 text-brand-500" />
-                Sesiones 1-a-1 con Erickson
+                Llamada grupal mensual con Erickson
               </li>
               <li className="flex items-start gap-2">
                 <Dot className="mt-0.5 h-4 w-4 shrink-0 text-brand-500" />

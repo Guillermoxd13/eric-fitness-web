@@ -33,29 +33,29 @@ const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://eric-fitness-web.ve
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: "Eric/Fit · Entrena como quien va en serio",
-    template: "%s · Eric/Fit",
+    default: "Eric Fitness · Entrena como quien va en serio",
+    template: "%s · Eric Fitness",
   },
   description:
-    "El método completo de Erickson Zambrano. Fuerza, hipertrofia y movilidad en vídeo HD. Nuevas sesiones cada semana. Cero gurús.",
-  applicationName: "Eric/Fit",
+    "El método completo de Erickson Zambrano. Fuerza, hipertrofia, movilidad, mentalidad, hábitos y nutrición en vídeo HD. Nuevas sesiones cada mes. Cero gurús.",
+  applicationName: "Eric Fitness",
   authors: [{ name: "Erickson Zambrano" }],
   keywords: [
     "entrenamiento", "fitness", "hipertrofia", "fuerza", "HIIT",
-    "Erickson Zambrano", "rutinas", "gym", "coaching",
+    "Erickson Zambrano", "rutinas", "gym", "mentalidad", "nutrición", "hábitos",
   ],
   openGraph: {
     type: "website",
     locale: "es_ES",
     url: siteUrl,
-    siteName: "Eric/Fit",
-    title: "Eric/Fit · Entrena como quien va en serio",
+    siteName: "Eric Fitness",
+    title: "Eric Fitness · Entrena como quien va en serio",
     description:
-      "Rutinas reales en vídeo HD. Método completo por semanas, sin anuncios, con sesiones 1-a-1.",
+      "Rutinas reales en vídeo HD. Método completo por semanas, sin anuncios. Mentalidad, hábitos y nutrición incluidos.",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Eric/Fit · Entrena como quien va en serio",
+    title: "Eric Fitness · Entrena como quien va en serio",
     description: "El método completo de Erickson Zambrano.",
   },
   robots: { index: true, follow: true },

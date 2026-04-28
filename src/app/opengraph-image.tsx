@@ -1,7 +1,7 @@
 import { ImageResponse } from "next/og";
 
 export const runtime = "edge";
-export const alt = "Eric/Fit · Entrena como quien va en serio";
+export const alt = "Eric Fitness · Entrena como quien va en serio";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -35,7 +35,7 @@ export default async function OpengraphImage() {
             style={{
               display: "flex",
               alignItems: "baseline",
-              gap: "6px",
+              gap: "10px",
               fontSize: "34px",
               fontWeight: 800,
               letterSpacing: "-0.02em",
@@ -43,10 +43,7 @@ export default async function OpengraphImage() {
             }}
           >
             <span>ERIC</span>
-            <span style={{ display: "inline-flex", alignItems: "baseline" }}>
-              <span style={{ color: "#ef4444" }}>/</span>
-              <span>FIT</span>
-            </span>
+            <span style={{ color: "#ef4444" }}>FITNESS</span>
           </div>
 
           <div
