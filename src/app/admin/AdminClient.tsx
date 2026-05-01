@@ -15,8 +15,8 @@ import {
   Unlock,
   X,
 } from "lucide-react";
-import { VIDEO_CATEGORIES } from "@/lib/video-categories";
 import { Badge } from "@/components/ui/Badge";
+import { CategorySelect } from "./CategorySelect";
 
 export type AdminVideo = {
   id: string;
@@ -251,26 +251,7 @@ function CreateVideoForm({ onCreated }: { onCreated: (v: AdminVideo) => void }) 
           {/* Category */}
           <div>
             <label className="label" htmlFor="category">Categoría</label>
-            <select
-              id="category"
-              value={category}
-              onChange={(e) => setCategory(e.target.value)}
-              className="input appearance-none bg-[length:16px] bg-[right_14px_center] bg-no-repeat pr-10"
-              style={{
-                colorScheme: "dark",
-                backgroundImage:
-                  "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='rgba(255,255,255,0.6)' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>\")",
-              }}
-            >
-              <option value="" style={{ backgroundColor: "#0a0a0b", color: "rgba(255,255,255,0.6)" }}>
-                — sin categoría —
-              </option>
-              {VIDEO_CATEGORIES.map((c) => (
-                <option key={c} value={c} style={{ backgroundColor: "#0a0a0b", color: "#ffffff" }}>
-                  {c}
-                </option>
-              ))}
-            </select>
+            <CategorySelect id="category" value={category} onChange={setCategory} />
           </div>
 
           {/* Locked toggle */}
@@ -402,25 +383,7 @@ function VideoRow({
               placeholder="Descripción"
             />
             <div className="grid gap-3 sm:grid-cols-3">
-              <select
-                value={category}
-                onChange={(e) => setCategory(e.target.value)}
-                className="input appearance-none bg-[length:16px] bg-[right_14px_center] bg-no-repeat pr-10"
-                style={{
-                  colorScheme: "dark",
-                  backgroundImage:
-                    "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='rgba(255,255,255,0.6)' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>\")",
-                }}
-              >
-                <option value="" style={{ backgroundColor: "#0a0a0b", color: "rgba(255,255,255,0.6)" }}>
-                  — sin categoría —
-                </option>
-                {VIDEO_CATEGORIES.map((c) => (
-                  <option key={c} value={c} style={{ backgroundColor: "#0a0a0b", color: "#ffffff" }}>
-                    {c}
-                  </option>
-                ))}
-              </select>
+              <CategorySelect value={category} onChange={setCategory} />
               <input
                 type="number"
                 value={position}
