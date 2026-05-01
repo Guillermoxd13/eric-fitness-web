@@ -15,7 +15,7 @@ import {
   Unlock,
   X,
 } from "lucide-react";
-import { VIDEO_CATEGORIES } from "@/lib/admin";
+import { VIDEO_CATEGORIES } from "@/lib/video-categories";
 import { Badge } from "@/components/ui/Badge";
 
 export type AdminVideo = {
