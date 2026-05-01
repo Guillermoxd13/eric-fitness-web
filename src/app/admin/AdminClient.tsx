@@ -255,11 +255,20 @@ function CreateVideoForm({ onCreated }: { onCreated: (v: AdminVideo) => void }) 
               id="category"
               value={category}
               onChange={(e) => setCategory(e.target.value)}
-              className="input"
+              className="input appearance-none bg-[length:16px] bg-[right_14px_center] bg-no-repeat pr-10"
+              style={{
+                colorScheme: "dark",
+                backgroundImage:
+                  "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='rgba(255,255,255,0.6)' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>\")",
+              }}
             >
-              <option value="">— sin categoría —</option>
+              <option value="" style={{ backgroundColor: "#0a0a0b", color: "rgba(255,255,255,0.6)" }}>
+                — sin categoría —
+              </option>
               {VIDEO_CATEGORIES.map((c) => (
-                <option key={c} value={c}>{c}</option>
+                <option key={c} value={c} style={{ backgroundColor: "#0a0a0b", color: "#ffffff" }}>
+                  {c}
+                </option>
               ))}
             </select>
           </div>
@@ -396,11 +405,20 @@ function VideoRow({
               <select
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
-                className="input"
+                className="input appearance-none bg-[length:16px] bg-[right_14px_center] bg-no-repeat pr-10"
+                style={{
+                  colorScheme: "dark",
+                  backgroundImage:
+                    "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='rgba(255,255,255,0.6)' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>\")",
+                }}
               >
-                <option value="">— sin categoría —</option>
+                <option value="" style={{ backgroundColor: "#0a0a0b", color: "rgba(255,255,255,0.6)" }}>
+                  — sin categoría —
+                </option>
                 {VIDEO_CATEGORIES.map((c) => (
-                  <option key={c} value={c}>{c}</option>
+                  <option key={c} value={c} style={{ backgroundColor: "#0a0a0b", color: "#ffffff" }}>
+                    {c}
+                  </option>
                 ))}
               </select>
               <input
