@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
-import { User } from "lucide-react";
+import { Settings, User } from "lucide-react";
 import { Logo } from "./ui/Logo";
 import { LogoutButton } from "./LogoutButton";
 import { MobileMenu } from "./MobileMenu";
@@ -14,15 +14,17 @@ export async function Navbar() {
   } = await supabase.auth.getUser();
 
   let isPremium = false;
+  let isAdmin = false;
   if (user) {
     const { data: profile } = await supabase
       .from("profiles")
-      .select("is_premium, current_period_end")
+      .select("is_premium, current_period_end, is_admin")
       .eq("id", user.id)
-      .maybeSingle<{ is_premium: boolean; current_period_end: string | null }>();
+      .maybeSingle<{ is_premium: boolean; current_period_end: string | null; is_admin: boolean }>();
     isPremium =
       !!profile?.is_premium &&
       (!profile.current_period_end || new Date(profile.current_period_end) > new Date());
+    isAdmin = !!profile?.is_admin;
   }
 
   const mobileItems: NavItem[] = user
@@ -33,6 +35,9 @@ export async function Navbar() {
           ? []
           : ([{ href: "/pricing", label: "Hazte Premium", variant: "primary" }] as NavItem[])),
         { href: "/account", label: "Mi cuenta", variant: "outline" },
+        ...(isAdmin
+          ? ([{ href: "/admin", label: "Admin", variant: "outline" }] as NavItem[])
+          : []),
       ]
     : [
         { href: "/pricing", label: "Planes", variant: "ghost" },
@@ -55,6 +60,16 @@ export async function Navbar() {
               {!isPremium && (
                 <Link href="/pricing" className="btn-primary btn-sm ml-1">
                   Hazte Premium
+                </Link>
+              )}
+              {isAdmin && (
+                <Link
+                  href="/admin"
+                  aria-label="Panel de admin"
+                  title="Panel de admin"
+                  className="ml-2 grid h-9 w-9 place-items-center rounded-lg border border-gold-400/40 text-gold-400 transition hover:border-gold-400 hover:bg-gold-400/10"
+                >
+                  <Settings className="h-4 w-4" />
                 </Link>
               )}
               <Link
