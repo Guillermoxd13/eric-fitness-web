@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { VideoPlayer } from "@/components/VideoPlayer";
 import { Badge } from "@/components/ui/Badge";
+import { VideoStructuredData } from "@/components/StructuredData";
 import type { Video } from "@/types/database";
 
 export const dynamic = "force-dynamic";
@@ -54,6 +55,12 @@ export default async function WatchPage({
 
   return (
     <div className="mx-auto max-w-6xl px-6 py-8 md:px-10 md:py-10">
+      <VideoStructuredData
+        name={video.title}
+        description={video.description}
+        thumbnailUrl={video.thumbnail_url}
+        duration={video.duration_seconds}
+      />
       <Link
         href="/dashboard"
         className="inline-flex items-center gap-1.5 text-[13px] text-white/60 transition hover:text-white"

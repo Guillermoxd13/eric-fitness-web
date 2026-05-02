@@ -16,6 +16,12 @@ export function MobileMenu({ items }: { items: Item[] }) {
   }, [pathname]);
 
   useEffect(() => {
+    const close = () => setOpen(false);
+    window.addEventListener("hashchange", close);
+    return () => window.removeEventListener("hashchange", close);
+  }, []);
+
+  useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") setOpen(false);
@@ -46,6 +52,7 @@ export function MobileMenu({ items }: { items: Item[] }) {
               <Link
                 key={item.href}
                 href={item.href}
+                onClick={() => setOpen(false)}
                 className={
                   item.variant === "primary"
                     ? "btn-primary w-full justify-center"

@@ -17,6 +17,10 @@ import { createClient } from "@/lib/supabase/server";
 import { Eyebrow } from "@/components/ui/Eyebrow";
 import { Stat } from "@/components/ui/Stat";
 import { Badge } from "@/components/ui/Badge";
+import {
+  OrganizationStructuredData,
+  ServiceStructuredData,
+} from "@/components/StructuredData";
 
 export const dynamic = "force-dynamic";
 
@@ -112,6 +116,9 @@ export default async function LandingPage() {
 
   return (
     <>
+      <OrganizationStructuredData />
+      <ServiceStructuredData />
+
       {/* ── HERO ─────────────────────────────────────────── */}
       <section className="border-b border-hair">
         <div className="mx-auto grid max-w-6xl md:grid-cols-[1.05fr_1fr]">
